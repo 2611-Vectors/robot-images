@@ -1,3 +1,4 @@
 # Your team's SSH public keys, one per line, to log in to your computers as admin. Public keys only:
 # the images may be public. Leave out a key's comment if it's a name or an email address. With none,
 # nobody can log in.
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID2KGo8nCPJd+FlyJv4ImKRgGLxSu3+KYj5DR31e+bDu robots
