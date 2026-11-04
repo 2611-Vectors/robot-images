@@ -66,14 +66,14 @@ images:
       ram: [/var/lib/chrony]
 
 computers:
-  # About two AprilTag cameras per Orange Pi 5: a second computer for the back cameras, say. The
-  # robot's definition lists each as a Spotter board at its address,
+  # Numbered, not named for a place on the robot: vision-N is 10.26.11.1N. Which cameras a board
+  # carries is the robot's code, which lists each as a Spotter board at its address,
   # new BoardDefinition("10.26.11.11", List.of("visor")).
-  - hostname: vision-front
+  - hostname: vision-1
     image: visor
     address: 10.26.11.11/24
     gateway: 10.26.11.4
-  # - hostname: vision-back
-  #   image: visor
-  #   address: 10.26.11.12/24
-  #   gateway: 10.26.11.4
+  - hostname: vision-2
+    image: visor
+    address: 10.26.11.12/24
+    gateway: 10.26.11.4
