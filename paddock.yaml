@@ -68,12 +68,12 @@ images:
 computers:
   # About two AprilTag cameras per Orange Pi 5: a second computer for the back cameras, say. The
   # robot's definition lists each as a Spotter board at its address,
-  # new BoardDefinition("10.TE.AM.11", List.of("visor")).
+  # new BoardDefinition("10.26.11.11", List.of("visor")).
   - hostname: vision-front
     image: visor
-    address: 10.0.0.11/24        # yours: 10.TE.AM.11/24 (team 1234: 10.12.34.11/24)
-    gateway: 10.0.0.4            # yours: 10.TE.AM.4
+    address: 10.26.11.11/24
+    gateway: 10.26.11.4
   # - hostname: vision-back
   #   image: visor
-  #   address: 10.0.0.12/24
-  #   gateway: 10.0.0.4
+  #   address: 10.26.11.12/24
+  #   gateway: 10.26.11.4
