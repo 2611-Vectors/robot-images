@@ -1,0 +1,79 @@
+# Your robot's computer images, built by Paddock (https://github.com/mikegrundvig/frc-paddock):
+# each image is a base and what's added to it; each computer gets its own copy, stamped with its
+# hostname and address. README.md says how to change it, and Paddock's README says every key.
+images:
+  # A vision computer running Visor (github.com/mikegrundvig/frc-visor): plain Armbian for the Orange
+  # Pi 5 (Debian, Rockchip's kernel), with Spotter's agent, through which the robot program installs
+  # and configures Visor as it starts (frc-robot-runtime's docs/visor.md). The computer is its
+  # cameras and its address: nothing of a robot's is in the image, so a spare flashed from it works.
+  visor:
+    from:
+      url: https://dl.armbian.com/orangepi5/archive/Armbian_26.8.1_Orangepi5_trixie_vendor_6.1.115_minimal.img.xz
+      sha256: 8e2c7217a60888c0cf487a85d445b3ee8ea4f533c2293df12d36ccfc6437e040
+    grow: 1G
+    steps:
+      # Spotter's agent, the robot's way in (github.com/mikegrundvig/frc-spotter's releases list each
+      # file's SHA-256), and the robot controller it takes the robot's pushes and actions from.
+      - package: https://github.com/mikegrundvig/frc-spotter/releases/download/v0.4.1/frc-spotter_0.4.1_arm64.deb
+        sha256: 17494387fe0a49626a8428661258f08a12854b774ffa80abcdc126cd3e7897e5
+      - file: files/visor/agent.json
+        to: /etc/frc-spotter/agent.json
+        mode: "0644"
+      # What Visor's pack needs of the agent: /opt/visor to write, and Visor to restart.
+      - file: files/visor/frc-spotter-visor.conf
+        to: /etc/systemd/system/frc-spotter.service.d/visor.conf
+        mode: "0644"
+      - file: files/visor/50-frc-spotter-visor.rules
+        to: /etc/polkit-1/rules.d/50-frc-spotter-visor.rules
+        mode: "0644"
+      # A Visor release, for its program and unit (setup/visor-orangepi.sh): the robot installs its
+      # own version over it.
+      - download: https://github.com/mikegrundvig/frc-visor/releases/download/v2026.11.6/visor-2026.11.6-linux-arm64.tar.gz
+        sha256: a25078e602cdf9a648e0a225952d783b63a07253923477f22603ca2964f88dac
+        to: /opt/visor/.release.tar.gz
+      - file: files/visor/visor-service.conf
+        to: /etc/systemd/system/visor.service.d/10-team.conf
+        mode: "0644"
+      - file: files/visor/cpu-performance.service
+        to: /etc/systemd/system/cpu-performance.service
+        mode: "0644"
+      # Logins by SSH key only, each drive with its own host key; NetworkManager's settings; the
+      # journal kept and synced; e2fsck that copes with no clock battery.
+      - file: files/sshd.conf
+        to: /etc/ssh/sshd_config.d/10-team.conf
+        mode: "0644"
+      - file: files/ssh-hostkey.service
+        to: /etc/systemd/system/ssh-hostkey.service
+        mode: "0644"
+      - file: files/NetworkManager.conf
+        to: /etc/NetworkManager/conf.d/90-team.conf
+        mode: "0644"
+      - file: files/journald.conf
+        to: /etc/systemd/journald.conf.d/70-team.conf
+        mode: "0644"
+      - file: files/e2fsck.conf
+        to: /etc/e2fsck.conf
+        mode: "0644"
+      # NetworkManager, chrony, Spotter's debian pack, Visor's account and unit, and the admin login;
+      # then what any robot computer from an Armbian base needs (each script says why).
+      - run: setup/visor-orangepi.sh
+      - run: setup/armbian-robot.sh
+    read-only:
+      data: 2G
+      # Visor (the robot installs it), the packs the robot pushes, and the journal; chrony's drift
+      # file needn't last.
+      keep: [/opt/visor, /var/lib/frc-spotter, /var/log/journal]
+      ram: [/var/lib/chrony]
+
+computers:
+  # About two AprilTag cameras per Orange Pi 5: a second computer for the back cameras, say. The
+  # robot's definition lists each as a Spotter board at its address,
+  # new BoardDefinition("10.TE.AM.11", List.of("visor")).
+  - hostname: vision-front
+    image: visor
+    address: 10.0.0.11/24        # yours: 10.TE.AM.11/24 (team 1234: 10.12.34.11/24)
+    gateway: 10.0.0.4            # yours: 10.TE.AM.4
+  # - hostname: vision-back
+  #   image: visor
+  #   address: 10.0.0.12/24
+  #   gateway: 10.0.0.4

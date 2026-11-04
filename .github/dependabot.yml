@@ -1,0 +1,8 @@
+# Weekly pull requests when a new Paddock release (the reusable workflow this repository pins) or a
+# newer GitHub action comes out.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

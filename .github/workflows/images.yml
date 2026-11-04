@@ -1,0 +1,30 @@
+name: Images
+
+# Builds your computers' images with Paddock. Push a tag named images-<something> (or run this by
+# hand with a release name) to publish them as a release; a change to what they're built from builds
+# them as this run's artifacts, to check it.
+on:
+  push:
+    branches: [main]
+    paths: [paddock.yaml, "setup/**", "files/**", "keys/**"]
+    tags: ["images-*"]
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Release to cut, such as images-2027.1 (empty: build only)"
+        default: ""
+
+jobs:
+  images:
+    # The template's own repository publishes nothing: its input is an example (team 0's addresses).
+    # Run there by hand with no release name, it builds the example's images as the run's artifacts,
+    # to check them.
+    if: >-
+      github.repository != 'mikegrundvig/frc-paddock-starter' ||
+      (github.event_name == 'workflow_dispatch' && inputs.release == '')
+    # Paddock pinned to an exact version, so your images change only when this repository does.
+    uses: mikegrundvig/frc-paddock/.github/workflows/build-images.yml@v1.0.0
+    permissions:
+      contents: write
+    with:
+      release: ${{ github.ref_type == 'tag' && github.ref_name || inputs.release }}

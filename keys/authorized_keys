@@ -1,0 +1,3 @@
+# Your team's SSH public keys, one per line, to log in to your computers as admin. Public keys only:
+# the images may be public. Leave out a key's comment if it's a name or an email address. With none,
+# nobody can log in.
