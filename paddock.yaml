@@ -26,8 +26,8 @@ images:
       - file: files/visor/50-frc-spotter-visor.rules
         to: /etc/polkit-1/rules.d/50-frc-spotter-visor.rules
         mode: "0644"
-      # A Visor release, for its program and unit (setup/visor-orangepi.sh): the robot installs its
-      # own version over it.
+      # A Visor release, for its program and unit (setup/visor-orangepi.sh), and kept where it's put:
+      # the robot installs its own version over the program.
       - download: https://github.com/mikegrundvig/frc-visor/releases/download/v2026.11.6/visor-2026.11.6-linux-arm64.tar.gz
         sha256: a25078e602cdf9a648e0a225952d783b63a07253923477f22603ca2964f88dac
         to: /opt/visor/.release.tar.gz

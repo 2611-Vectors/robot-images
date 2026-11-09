@@ -29,14 +29,15 @@ chmod -R go-w /etc/frc-spotter/packs/debian
 # program and unit from the release paddock.yaml downloads, so the computer runs `visor cameras`
 # and `visor record --device` before any robot has configured it (lens calibration). The robot
 # replaces the program with its own version; `visor` on the PATH (files/visor/visor, root's) runs
-# whichever is in place, and never as root. ---
+# whichever is in place, and never as root. The release stays at /opt/visor/.release.tar.gz, as
+# paddock.yaml's step put it (Paddock's inspection checks each step's file is in the image). ---
 useradd --system --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin --groups video visor
 release=/opt/visor/.release.tar.gz
 unpacked=$(mktemp -d)
 tar -xzf "$release" -C "$unpacked" ./visor ./visor.service
 install -m 0755 -o frc-spotter -g frc-spotter "$unpacked/visor" /opt/visor/visor
 install -m 0644 "$unpacked/visor.service" /etc/systemd/system/visor.service
-rm -rf "$unpacked" "$release"
+rm -rf "$unpacked"
 chown frc-spotter:frc-spotter /opt/visor
 chmod 0755 /opt/visor
 /opt/visor/visor version
