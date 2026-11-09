@@ -49,8 +49,9 @@ jobs:
     if: >-
       github.repository != 'mikegrundvig/frc-paddock-starter' ||
       (github.event_name == 'workflow_dispatch' && inputs.release == '')
-    # Paddock pinned to an exact version, so your images change only when this repository does.
-    uses: mikegrundvig/frc-paddock/.github/workflows/build-images.yml@v1.0.0
+    # Paddock pinned to a commit (the version beside it), so your images change only when this
+    # repository does: a tag can be moved, a commit can't.
+    uses: mikegrundvig/frc-paddock/.github/workflows/build-images.yml@29800ce7f70e97208f4163264e3396073c267236 # v1.0.0
     permissions:
       contents: write
     with:
