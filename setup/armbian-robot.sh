@@ -1,8 +1,10 @@
 #!/bin/sh
-# Run by Paddock as root inside an Armbian (or Ubuntu) image for a robot computer, as an image's
-# last step, after its own setup: what a read-only root, NetworkManager owning the network, and a
-# computer anyone could download can't have. Each part does nothing where its base's habit isn't
-# there.
+# Run by Paddock as root inside an Armbian image for a robot computer, as an image's last step,
+# after its own setup: what a read-only root, NetworkManager owning the network, and a computer
+# anyone could download can't have. The parts that check for a file first (cloud-init, netplan)
+# do nothing where the base hasn't one. The masks name units of the base paddock.yaml pins (Armbian
+# on Debian trixie): Paddock's inspection fails a mask of a unit the image doesn't have, which is
+# how a misspelt name shows, so another base needs this list checked against its own units.
 set -eu
 
 # --- First boot: cloud-init (Ubuntu's) would make users, write the network, and grow the root at
@@ -24,16 +26,15 @@ systemctl mask systemd-networkd.service systemd-networkd.socket systemd-networkd
 
 # --- A read-only root: Armbian's RAM logging (it would hide the kept journal), its first-boot
 # resize (the data partition follows the root), and its first-run tasks (they write the root) off;
-# what only writes the root masked (package lists, man pages, log rotation, dpkg backups, unattended
-# upgrades, snaps); the journal is the log, so rsyslog goes. ---
+# what only writes the root masked (package lists, man pages, log rotation, dpkg backups); the
+# journal is the log, so rsyslog goes. ---
 if [ -f /etc/default/armbian-ramlog ]; then
   sed -i 's/^ENABLED=.*/ENABLED=false/' /etc/default/armbian-ramlog
 fi
 touch /root/.no_rootfs_resize
 systemctl mask armbian-ramlog.service armbian-resize-filesystem.service armbian-firstrun.service \
   armbian-led-state.service
-systemctl mask apt-daily.timer apt-daily-upgrade.timer man-db.timer logrotate.timer dpkg-db-backup.timer \
-  unattended-upgrades.service snapd.service snapd.socket snapd.seeded.service
+systemctl mask apt-daily.timer apt-daily-upgrade.timer man-db.timer logrotate.timer dpkg-db-backup.timer
 systemctl mask rsyslog.service syslog.socket fake-hwclock-save.timer fake-hwclock-save.service
 # With no clock battery, systemd starts the clock no earlier than this file's time: the build's.
 touch /usr/lib/clock-epoch

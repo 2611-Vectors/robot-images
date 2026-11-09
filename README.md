@@ -53,7 +53,7 @@ needs paid ARM runners.
 |---|---|
 | `paddock.yaml` | The images (each a base and its steps) and the computers stamped from them. Paddock's README says every key |
 | `setup/visor-orangepi.sh` | The image's own setup: NetworkManager and chrony, Visor's account, program and unit, and the admin login |
-| `setup/armbian-robot.sh` | Its last step, for any robot computer from an Armbian base: NetworkManager owning the network, a read-only root's needs, no default passwords. Each part says why |
+| `setup/armbian-robot.sh` | Its last step, for a robot computer from the pinned Armbian base: NetworkManager owning the network, a read-only root's needs, no default passwords. Each part says why; its masks are of this base's units |
 | `files/` | Files the steps copy in: SSH's settings and each drive's own host key, NetworkManager's, the journal's, e2fsck's; `files/visor/`: Spotter's settings, what Visor's pack may do (write `/opt/visor`, restart Visor), Visor waiting for its configuration, `visor` on the PATH for people (never as root), chrony's, the CPU at full clock; `files/spotter-packs/debian/`: Spotter's catalog pack for the computer's own health, copied from Spotter's release the image installs (copy it again when you move to another) |
 | `keys/authorized_keys` | Your team's SSH public keys |
 | `test/files_test.sh` | The lines in `files/` the boards depend on (chrony's `rtcsync`, the agent starting without the data partition, `visor` refusing root), checked before every build |

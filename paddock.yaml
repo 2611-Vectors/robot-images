@@ -59,7 +59,7 @@ images:
         to: /etc/e2fsck.conf
         mode: "0644"
       # NetworkManager, chrony, Spotter's debian pack, Visor's account and unit, and the admin login;
-      # then what any robot computer from an Armbian base needs (each script says why).
+      # then what a robot computer from this Armbian base needs (each script says why).
       - run: setup/visor-orangepi.sh
       - run: setup/armbian-robot.sh
     read-only:
