@@ -1,0 +1,10 @@
+#!/bin/sh
+# `visor` on the PATH, for people: `visor cameras` and `visor record --device` as admin (in the
+# video group). It runs the Visor in /opt/visor, which the robot replaces through Spotter's agent, so
+# that program is the agent's to write. As root it would run whatever was last pushed there with
+# root's power, so this refuses root: run it without sudo.
+if [ "$(id -u)" -eq 0 ]; then
+  echo "visor: not as root (or with sudo): /opt/visor/visor is the robot's to replace. Run it as admin." >&2
+  exit 1
+fi
+exec /opt/visor/visor "$@"

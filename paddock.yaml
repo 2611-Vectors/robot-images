@@ -31,6 +31,10 @@ images:
       - download: https://github.com/mikegrundvig/frc-visor/releases/download/v2026.11.6/visor-2026.11.6-linux-arm64.tar.gz
         sha256: a25078e602cdf9a648e0a225952d783b63a07253923477f22603ca2964f88dac
         to: /opt/visor/.release.tar.gz
+      # `visor` for people, root's: it runs the robot's Visor in /opt/visor, but never as root.
+      - file: files/visor/visor
+        to: /usr/local/bin/visor
+        mode: "0755"
       - file: files/visor/visor-service.conf
         to: /etc/systemd/system/visor.service.d/10-team.conf
         mode: "0644"

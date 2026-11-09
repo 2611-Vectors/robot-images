@@ -28,14 +28,14 @@ chmod -R go-w /etc/frc-spotter/packs/debian
 # --- Visor: its account, its folder (the agent's to write: Visor's pack installs into it), and the
 # program and unit from the release paddock.yaml downloads, so the computer runs `visor cameras`
 # and `visor record --device` before any robot has configured it (lens calibration). The robot
-# replaces the program with its own version; `visor` on the PATH is whichever is in place. ---
+# replaces the program with its own version; `visor` on the PATH (files/visor/visor, root's) runs
+# whichever is in place, and never as root. ---
 useradd --system --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin --groups video visor
 release=/opt/visor/.release.tar.gz
 unpacked=$(mktemp -d)
 tar -xzf "$release" -C "$unpacked" ./visor ./visor.service
 install -m 0755 -o frc-spotter -g frc-spotter "$unpacked/visor" /opt/visor/visor
 install -m 0644 "$unpacked/visor.service" /etc/systemd/system/visor.service
-ln -s /opt/visor/visor /usr/local/bin/visor
 rm -rf "$unpacked" "$release"
 chown frc-spotter:frc-spotter /opt/visor
 chmod 0755 /opt/visor

@@ -14,8 +14,35 @@ on:
         description: "Release to cut, such as images-2027.1 (empty: build only)"
         default: ""
 
+permissions:
+  contents: read
+
 jobs:
+  # The lines in files/ the boards depend on (test/files_test.sh), before anything is built.
+  files:
+    name: Check the files
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # Pinned to a commit (the version beside it), so a moved tag can't change what runs.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install yq
+        env:
+          YQ_URL: https://github.com/mikefarah/yq/releases/download/v4.54.1/yq_linux_amd64
+          YQ_SHA256: 8e34fc298390875de416e6a4afcb8cabeceb25d9aa8506c1a2f9353cf702ea5f
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          curl --fail --location --silent --show-error --retry 3 --output "$RUNNER_TEMP/bin/yq" "$YQ_URL"
+          echo "$YQ_SHA256  $RUNNER_TEMP/bin/yq" | sha256sum --check --strict
+          chmod +x "$RUNNER_TEMP/bin/yq"
+          echo "$RUNNER_TEMP/bin" >>"$GITHUB_PATH"
+      - name: test/files_test.sh
+        run: test/files_test.sh
+
   images:
+    needs: files
     # The template's own repository publishes nothing: its input is an example (team 0's addresses).
     # Run there by hand with no release name, it builds the example's images as the run's artifacts,
     # to check them.
