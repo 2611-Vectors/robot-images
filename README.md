@@ -21,15 +21,17 @@ power cut can't damage it; SSH takes keys only, and no password works.
 2. **Set your computers' addresses** in `paddock.yaml`: `10.TE.AM.11/24` and gateway `10.TE.AM.4`
    for team 1234 are `10.12.34.11/24` and `10.12.34.4`. Add a computer for each board. Also your
    robot controller's address, `10.TE.AM.2`, in `files/visor/agent.json` (Spotter takes the robot's
-   pushes and actions from it alone) and `files/visor/chrony.conf` (the clock Visor stamps frames
-   with).
+   pushes and actions from it alone). That's its one place: the build writes chrony's server (the
+   clock Visor stamps frames with) from it.
 3. **Pick your versions:** the base image for your board from
    [Armbian's downloads](https://www.armbian.com/orange-pi-5/) (`from.url`, a minimal image, with
    its `.sha` file's SHA-256), Spotter's agent from
-   [its releases](https://github.com/mikegrundvig/frc-spotter/releases) (the `package` step), and a
-   Visor release from [its releases](https://github.com/mikegrundvig/frc-visor/releases) (the
-   `download` step; each release lists its files' SHA-256). The robot installs its own Visor over the
-   image's, so that one only needs to run.
+   [its releases](https://github.com/mikegrundvig/frc-spotter/releases) (the `package` step, and
+   the `download` of the same tag's source, for its debian pack: move both together), and a Visor
+   release from [its releases](https://github.com/mikegrundvig/frc-visor/releases) (the `download`
+   step; each release lists its files' SHA-256). The robot installs its own Visor over the image's,
+   so that one only needs to run; what the image needs for Visor (its account, folder and unit, and
+   what its pack needs of the agent) comes from the same release.
 4. **Add your SSH public keys** to `keys/authorized_keys`, one per line, to log in as `admin`, with
    sudo. Public keys only: the images may be public. With none, nobody can log in.
 5. **Build.** Run *Images* from the Actions tab with a release name, such as `images-2027.1`, or push
@@ -52,11 +54,13 @@ needs paid ARM runners.
 | Path | What |
 |---|---|
 | `paddock.yaml` | The images (each a base and its steps) and the computers stamped from them. Paddock's README says every key |
-| `setup/visor-orangepi.sh` | The image's own setup: NetworkManager and chrony, Visor's account, program and unit, and the admin login |
+| `setup/visor-orangepi.sh` | The image's own setup: NetworkManager and chrony, Spotter's debian pack from its release's source, Visor's program and its part of the image (`os/` in its release), and the admin login |
+| `setup/chrony-conf.sh` | chrony's configuration, its server the controller's address from `files/visor/agent.json` |
 | `setup/armbian-robot.sh` | Its last step, for a robot computer from the pinned Armbian base: NetworkManager owning the network, a read-only root's needs, no default passwords. Each part says why; its masks are of this base's units |
-| `files/` | Files the steps copy in: SSH's settings and each drive's own host key, NetworkManager's, the journal's, e2fsck's; `files/visor/`: Spotter's settings, what Visor's pack may do (write `/opt/visor`, restart Visor), Visor waiting for its configuration, `visor` on the PATH for people (never as root), chrony's, the CPU at full clock; `files/spotter-packs/debian/`: Spotter's catalog pack for the computer's own health, copied from Spotter's release the image installs (copy it again when you move to another) |
+| `files/` | Files the steps copy in: SSH's settings and each drive's own host key, NetworkManager's, the journal's, e2fsck's, the agent waiting for the kept paths' mounts; `files/visor/`: Spotter's settings (the controller's address), this board's part of Visor's unit (its fast cores, `/opt/visor` on the data partition), `visor` on the PATH for people (never as root), chrony's (its server filled in at the build), the CPU at full clock |
 | `keys/authorized_keys` | Your team's SSH public keys |
-| `test/files_test.sh` | The lines in `files/` the boards depend on (chrony's `rtcsync`, the agent starting without the data partition, `visor` refusing root), checked before every build |
+| `test/files_test.sh` | The lines in `files/` the boards depend on (chrony's `rtcsync`, the agent starting without the data partition, `visor` refusing root, the controller's address in one place), checked before every build |
+| `test/boot_check.sh` | The boot check (`boot:` in `paddock.yaml`): Paddock boots a copy of each built image in a container and runs it there, before any computer is stamped. It fails the build unless Spotter's agent is running, listening and never restarted, and Visor's program runs as its own user. `test/boot_check_test.sh` runs it on stand-ins, before every build |
 | `NOTICE.md` | What software your images hold and where its source is: keep it current when you change the base or add packages |
 
 **Another kind of computer** (a Raspberry Pi running something else, say) is another entry in

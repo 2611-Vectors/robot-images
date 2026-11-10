@@ -13,21 +13,25 @@ images:
     grow: 1G
     steps:
       # Spotter's agent, the robot's way in (github.com/mikegrundvig/frc-spotter's releases list each
-      # file's SHA-256), and the robot controller it takes the robot's pushes and actions from.
+      # file's SHA-256), and the robot controller it takes the robot's pushes and actions from:
+      # agent.json is that address's one place (chrony's is written from it).
       - package: https://github.com/mikegrundvig/frc-spotter/releases/download/v0.4.1/frc-spotter_0.4.1_arm64.deb
         sha256: 17494387fe0a49626a8428661258f08a12854b774ffa80abcdc126cd3e7897e5
       - file: files/visor/agent.json
         to: /etc/frc-spotter/agent.json
         mode: "0644"
-      # What Visor's pack needs of the agent: /opt/visor to write, and Visor to restart.
-      - file: files/visor/frc-spotter-visor.conf
-        to: /etc/systemd/system/frc-spotter.service.d/visor.conf
+      # The same release's source, for its catalog's debian pack (setup/visor-orangepi.sh). Move it
+      # with the package: the tag in both is the same.
+      - download: https://github.com/mikegrundvig/frc-spotter/archive/refs/tags/v0.4.1.tar.gz
+        sha256: f21fc2cd753e4c7385ca423e3818d52a857054c50fb4fa8905aa539473067ae0
+        to: /usr/local/share/frc-spotter/source.tar.gz
+      # The agent waits for the kept paths it writes.
+      - file: files/frc-spotter.conf
+        to: /etc/systemd/system/frc-spotter.service.d/10-team.conf
         mode: "0644"
-      - file: files/visor/50-frc-spotter-visor.rules
-        to: /etc/polkit-1/rules.d/50-frc-spotter-visor.rules
-        mode: "0644"
-      # A Visor release, for its program and unit (setup/visor-orangepi.sh), and kept where it's put:
-      # the robot installs its own version over the program.
+      # A Visor release, for its program and what the image needs for it, its os/ (its account, its
+      # folder, its unit, and what its pack needs of the agent: setup/visor-orangepi.sh), kept where
+      # it's put: the robot installs its own version over the program.
       - download: https://github.com/mikegrundvig/frc-visor/releases/download/v2026.11.6/visor-2026.11.6-linux-arm64.tar.gz
         sha256: a25078e602cdf9a648e0a225952d783b63a07253923477f22603ca2964f88dac
         to: /opt/visor/.release.tar.gz
@@ -35,6 +39,7 @@ images:
       - file: files/visor/visor
         to: /usr/local/bin/visor
         mode: "0755"
+      # This board's part of Visor's unit: its fast cores, and /opt/visor on the data partition.
       - file: files/visor/visor-service.conf
         to: /etc/systemd/system/visor.service.d/10-team.conf
         mode: "0644"
@@ -58,8 +63,8 @@ images:
       - file: files/e2fsck.conf
         to: /etc/e2fsck.conf
         mode: "0644"
-      # NetworkManager, chrony, Spotter's debian pack, Visor's account and unit, and the admin login;
-      # then what a robot computer from this Armbian base needs (each script says why).
+      # NetworkManager, chrony, Spotter's debian pack, Visor's part of the image, and the admin
+      # login; then what a robot computer from this Armbian base needs (each script says why).
       - run: setup/visor-orangepi.sh
       - run: setup/armbian-robot.sh
     read-only:
@@ -68,6 +73,10 @@ images:
       # file needn't last.
       keep: [/opt/visor, /var/lib/frc-spotter, /var/log/journal]
       ram: [/var/lib/chrony]
+    # Checked in a copy of the image booted on the build machine, before any computer is stamped:
+    # Spotter's agent up, and Visor's program running (test/boot_check.sh).
+    boot:
+      check: test/boot_check.sh
 
 computers:
   # Numbered, not named for a place on the robot: vision-N is 10.26.11.1N. Which cameras a board

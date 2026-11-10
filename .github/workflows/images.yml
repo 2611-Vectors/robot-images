@@ -6,7 +6,7 @@ name: Images
 on:
   push:
     branches: [main]
-    paths: [paddock.yaml, "setup/**", "files/**", "keys/**"]
+    paths: [paddock.yaml, "setup/**", "files/**", "keys/**", "test/**"]
     tags: ["images-*"]
   workflow_dispatch:
     inputs:
@@ -18,7 +18,8 @@ permissions:
   contents: read
 
 jobs:
-  # The lines in files/ the boards depend on (test/files_test.sh), before anything is built.
+  # The lines in files/ the boards depend on (test/files_test.sh), and the boot check's own rows
+  # (test/boot_check_test.sh), before anything is built.
   files:
     name: Check the files
     runs-on: ubuntu-24.04
@@ -40,6 +41,8 @@ jobs:
           echo "$RUNNER_TEMP/bin" >>"$GITHUB_PATH"
       - name: test/files_test.sh
         run: test/files_test.sh
+      - name: test/boot_check_test.sh
+        run: test/boot_check_test.sh
 
   images:
     needs: files
