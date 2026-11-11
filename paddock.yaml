@@ -15,15 +15,15 @@ images:
       # Spotter's agent, the robot's way in (github.com/mikegrundvig/frc-spotter's releases list each
       # file's SHA-256), and the robot controller it takes the robot's pushes and actions from:
       # agent.json is that address's one place (chrony's is written from it).
-      - package: https://github.com/mikegrundvig/frc-spotter/releases/download/v0.4.1/frc-spotter_0.4.1_arm64.deb
-        sha256: 17494387fe0a49626a8428661258f08a12854b774ffa80abcdc126cd3e7897e5
+      - package: https://github.com/mikegrundvig/frc-spotter/releases/download/v0.4.2/frc-spotter_0.4.2_arm64.deb
+        sha256: 5d88313ff2c094cf7cdb1024f89a88069d4197ffa71157580fdc1a88ef16ea4d
       - file: files/visor/agent.json
         to: /etc/frc-spotter/agent.json
         mode: "0644"
       # The same release's source, for its catalog's debian pack (setup/visor-orangepi.sh). Move it
       # with the package: the tag in both is the same.
-      - download: https://github.com/mikegrundvig/frc-spotter/archive/refs/tags/v0.4.1.tar.gz
-        sha256: f21fc2cd753e4c7385ca423e3818d52a857054c50fb4fa8905aa539473067ae0
+      - download: https://github.com/mikegrundvig/frc-spotter/archive/refs/tags/v0.4.2.tar.gz
+        sha256: 5ec9f33cee9cda8f23009f79187b05bf4cf0b88f724393bda85b123a173c69ce
         to: /usr/local/share/frc-spotter/source.tar.gz
       # The agent waits for the kept paths it writes.
       - file: files/frc-spotter.conf
@@ -32,8 +32,8 @@ images:
       # A Visor release, for its program and what the image needs for it, its os/ (its account, its
       # folder, its unit, and what its pack needs of the agent: setup/visor-orangepi.sh), kept where
       # it's put: the robot installs its own version over the program.
-      - download: https://github.com/mikegrundvig/frc-visor/releases/download/v2026.11.6/visor-2026.11.6-linux-arm64.tar.gz
-        sha256: a25078e602cdf9a648e0a225952d783b63a07253923477f22603ca2964f88dac
+      - download: https://github.com/mikegrundvig/frc-visor/releases/download/v2026.11.9/visor-2026.11.9-linux-arm64.tar.gz
+        sha256: 869876dc7c70387d291d5a30802b22e70cdf9c4aca0ef45fdb6a773e06ce3acd
         to: /opt/visor/.release.tar.gz
       # `visor` for people, root's: it runs the robot's Visor in /opt/visor, but never as root.
       - file: files/visor/visor
@@ -80,8 +80,8 @@ images:
 
 computers:
   # Numbered, not named for a place on the robot: vision-N is 10.26.11.1N. Which cameras a board
-  # carries is the robot's code, which lists each as a Spotter board at its address,
-  # new BoardDefinition("10.26.11.11", List.of("visor")).
+  # carries is the robot's code, which lists each board by its address,
+  # .withCoprocessors("10.26.11.11", "10.26.11.12").
   - hostname: vision-1
     image: visor
     address: 10.26.11.11/24
