@@ -40,7 +40,7 @@ else
   echo "boot check: $(head -n 1 <<<"$said")"
 fi
 
-# The agent: running, listening once its Java has started, and not restarted on the way, since a
+# The agent: running, listening, and not restarted on the way, since a
 # crash it came back from is a crash on the board too.
 up=no
 for ((i = 0; i < wait; i++)); do

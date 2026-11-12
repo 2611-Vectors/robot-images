@@ -15,15 +15,15 @@ images:
       # Spotter's agent, the robot's way in (github.com/mikegrundvig/frc-spotter's releases list each
       # file's SHA-256), and the robot controller it takes the robot's pushes and actions from:
       # agent.json is that address's one place (chrony's is written from it).
-      - package: https://github.com/mikegrundvig/frc-spotter/releases/download/v0.4.2/frc-spotter_0.4.2_arm64.deb
-        sha256: 5d88313ff2c094cf7cdb1024f89a88069d4197ffa71157580fdc1a88ef16ea4d
+      - package: https://github.com/mikegrundvig/frc-spotter/releases/download/v0.5.0/frc-spotter_0.5.0_arm64.deb
+        sha256: 836e1da5dafbfebe5c0d8129cd568831756a3d97fbd22f2c65a4098e298494b5
       - file: files/visor/agent.json
         to: /etc/frc-spotter/agent.json
         mode: "0644"
       # The same release's source, for its catalog's debian pack (setup/visor-orangepi.sh). Move it
       # with the package: the tag in both is the same.
-      - download: https://github.com/mikegrundvig/frc-spotter/archive/refs/tags/v0.4.2.tar.gz
-        sha256: 5ec9f33cee9cda8f23009f79187b05bf4cf0b88f724393bda85b123a173c69ce
+      - download: https://github.com/mikegrundvig/frc-spotter/archive/refs/tags/v0.5.0.tar.gz
+        sha256: 16b437a5d4bf9b047ec170e5203ea333950a98114dab110f5ea80f26fa60abc3
         to: /usr/local/share/frc-spotter/source.tar.gz
       # The agent waits for the kept paths it writes.
       - file: files/frc-spotter.conf
