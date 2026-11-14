@@ -32,8 +32,8 @@ images:
       # A Visor release, for its program and what the image needs for it, its os/ (its account, its
       # folder, its unit, and what its pack needs of the agent: setup/visor-orangepi.sh), kept where
       # it's put: the robot installs its own version over the program.
-      - download: https://github.com/mikegrundvig/frc-visor/releases/download/v2026.11.9/visor-2026.11.9-linux-arm64.tar.gz
-        sha256: 869876dc7c70387d291d5a30802b22e70cdf9c4aca0ef45fdb6a773e06ce3acd
+      - download: https://github.com/mikegrundvig/frc-visor/releases/download/v2026.11.14/visor-2026.11.14-linux-arm64.tar.gz
+        sha256: f4530419596052ae5dfdc7d94db040a13b6997a339e937e300bbbc7183fb3f15
         to: /opt/visor/.release.tar.gz
       # `visor` for people, root's: it runs the robot's Visor in /opt/visor, but never as root.
       - file: files/visor/visor
