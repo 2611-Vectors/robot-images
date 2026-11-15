@@ -17,6 +17,7 @@ must_have=(
   "files/frc-spotter.conf|After=opt-visor.mount var-lib-frc\\x2dspotter.mount|the agent waits for the kept paths' mounts when they work"
   "files/visor/visor-service.conf|RequiresMountsFor=/opt/visor|Visor runs only from the kept /opt/visor"
   "files/visor/visor-service.conf|CPUAffinity=4-7|Visor runs on the RK3588's fast cores, which are this board's to name"
+  "files/visor/cpu-performance.service|After=sysinit.target armbian-hardware-optimize.service|Armbian's hardware script sets the governor too, and the last to write wins: without the order the fast cores can be left ramping"
 )
 must_not_have=(
   "files/frc-spotter.conf|RequiresMountsFor=|a failed data partition would stop the agent, and the board would go dark"
