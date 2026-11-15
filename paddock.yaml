@@ -6,10 +6,16 @@ images:
   # Pi 5 (Debian, Rockchip's kernel), with Spotter's agent, through which the robot program installs
   # and configures Visor as it starts (frc-robot-runtime's docs/visor.md). The computer is its
   # cameras and its address: nothing of a robot's is in the image, so a spare flashed from it works.
+  #
+  # The base is PhotonVision's build of Armbian (github.com/PhotonVision/opi-image-generator), the
+  # one its own Orange Pi 5 images start from, for its kernel: Rockchip's 6.1.172, where Armbian's
+  # own download for this board is still 6.1.115. It differs from Armbian's in its bootloader (from
+  # github.com/Joshua-Riek/ubuntu-rockchip, which also starts from a board's own flash) and a
+  # device-tree overlay that names the GPIO lines.
   visor:
     from:
-      url: https://dl.armbian.com/orangepi5/archive/Armbian_26.8.1_Orangepi5_trixie_vendor_6.1.115_minimal.img.xz
-      sha256: 8e2c7217a60888c0cf487a85d445b3ee8ea4f533c2293df12d36ccfc6437e040
+      url: https://github.com/PhotonVision/opi-image-generator/releases/download/v2027.0.1/Armbian-unofficial_26.8.8_Orangepi5_trixie_vendor_6.1.172_minimal.img.xz
+      sha256: 51d7bdfac123d214e6570f8074ac46b05503442cd145664bcd789fe93d31b21e
     grow: 1G
     steps:
       # Spotter's agent, the robot's way in (github.com/mikegrundvig/frc-spotter's releases list each
