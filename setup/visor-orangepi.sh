@@ -24,11 +24,11 @@ systemctl enable NetworkManager.service chrony.service cpu-performance.service
 # USB never sleeps: the camera driver lets an idle camera sleep after two seconds, so opening a
 # stream is a wake-up of the camera and its port. The cameras are this computer's whole job, so
 # nothing is saved by it. On a running board, /sys/module/usbcore/parameters/autosuspend reads -1.
-# While the USB 3 ports are being proven: the debug messages of the Type-C port's PHY and of USB's
-# core (ports training, resetting and changing speed), which go to the kept journal
-# (journalctl -k), not to the screen. Take those two out once the ports are trusted. ---
+# To watch a port in trouble, add `usbcore.dyndbg=+p phy_rockchip_usbdp.dyndbg=+p` here: USB's
+# core and the Type-C port's PHY then say each port's training, resets and speed changes in the
+# kept journal (journalctl -k). ---
 grep -q '^extraargs=' /boot/armbianEnv.txt || echo 'extraargs=' >>/boot/armbianEnv.txt
-for argument in usbcore.autosuspend=-1 phy_rockchip_usbdp.dyndbg=+p usbcore.dyndbg=+p; do
+for argument in usbcore.autosuspend=-1; do
   sed -i "s/^extraargs=\\(.*\\)\$/extraargs=\\1 $argument/" /boot/armbianEnv.txt
   grep -q "^extraargs=.* $argument\\( \\|\$\\)" /boot/armbianEnv.txt ||
     { echo "/boot/armbianEnv.txt didn't take $argument" >&2; exit 1; }
