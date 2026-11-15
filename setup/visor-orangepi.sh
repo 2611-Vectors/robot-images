@@ -18,6 +18,16 @@ sh "$PADDOCK_CONFIG_DIR/setup/chrony-conf.sh" /etc/frc-spotter/agent.json \
 chmod 0644 /etc/chrony/chrony.conf
 systemctl enable NetworkManager.service chrony.service cpu-performance.service
 
+# --- USB never sleeps: the camera driver lets an idle camera sleep after two seconds, so opening a
+# stream is a wake-up of the camera and its port. The cameras are this computer's whole job, so
+# nothing is saved by it. A kernel argument, as USB's core is built into the kernel
+# (/boot/armbianEnv.txt's extraargs go onto its command line): on a running board,
+# /sys/module/usbcore/parameters/autosuspend reads -1. ---
+grep -q '^extraargs=' /boot/armbianEnv.txt || echo 'extraargs=' >>/boot/armbianEnv.txt
+sed -i 's/^extraargs=\(.*\)$/extraargs=\1 usbcore.autosuspend=-1/' /boot/armbianEnv.txt
+grep -q '^extraargs=.* usbcore.autosuspend=-1$' /boot/armbianEnv.txt ||
+  { echo "/boot/armbianEnv.txt didn't take usbcore.autosuspend=-1" >&2; exit 1; }
+
 # --- Spotter's debian pack, from the source of the agent's own release (paddock.yaml downloads it,
 # and it stays where it's put, as Paddock's inspection checks): the computer's own health, CPU, heat,
 # memory, disk, link, USB and clock, as Spotter's alerts on the robot. Installed with the image,
