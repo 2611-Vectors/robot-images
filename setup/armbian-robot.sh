@@ -36,6 +36,10 @@ systemctl mask armbian-ramlog.service armbian-resize-filesystem.service armbian-
   armbian-led-state.service
 systemctl mask apt-daily.timer apt-daily-upgrade.timer man-db.timer logrotate.timer dpkg-db-backup.timer
 systemctl mask rsyslog.service syslog.socket fake-hwclock-save.timer fake-hwclock-save.service
+# Two that only fail on this computer, and would show as failed units on every boot: the console's
+# font and keymap setup writes a cache into /etc (and nobody logs in on the console), and Armbian's
+# Bluetooth attach waits for a radio the Orange Pi 5 hasn't got.
+systemctl mask console-setup.service bluetooth-hciattach.service
 # With no clock battery, systemd starts the clock no earlier than this file's time: the build's.
 touch /usr/lib/clock-epoch
 
