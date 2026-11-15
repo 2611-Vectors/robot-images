@@ -8,9 +8,11 @@ set -eu
 export DEBIAN_FRONTEND=noninteractive
 
 # --- Packages from Armbian's own sources: NetworkManager (Paddock's network; the minimal image has
-# systemd-networkd, which setup/armbian-robot.sh turns off) and chrony (the robot's clock). ---
+# systemd-networkd, which setup/armbian-robot.sh turns off), chrony (the robot's clock), and
+# v4l-utils, for `v4l2-ctl`: a camera's stream opened without Visor, to tell a camera or port's
+# trouble from Visor's (v4l2-ctl -d /dev/video0 --stream-mmap --stream-count=300). ---
 apt-get update -q
-apt-get install -y -q --no-install-recommends network-manager chrony
+apt-get install -y -q --no-install-recommends network-manager chrony v4l-utils
 rm -rf /var/lib/apt/lists/*
 # chrony's server is the robot controller, whose address is agent.json's (setup/chrony-conf.sh).
 sh "$PADDOCK_CONFIG_DIR/setup/chrony-conf.sh" /etc/frc-spotter/agent.json \
@@ -18,15 +20,23 @@ sh "$PADDOCK_CONFIG_DIR/setup/chrony-conf.sh" /etc/frc-spotter/agent.json \
 chmod 0644 /etc/chrony/chrony.conf
 systemctl enable NetworkManager.service chrony.service cpu-performance.service
 
-# --- USB never sleeps: the camera driver lets an idle camera sleep after two seconds, so opening a
+# --- Kernel arguments (/boot/armbianEnv.txt's extraargs go onto its command line).
+# USB never sleeps: the camera driver lets an idle camera sleep after two seconds, so opening a
 # stream is a wake-up of the camera and its port. The cameras are this computer's whole job, so
-# nothing is saved by it. A kernel argument, as USB's core is built into the kernel
-# (/boot/armbianEnv.txt's extraargs go onto its command line): on a running board,
-# /sys/module/usbcore/parameters/autosuspend reads -1. ---
+# nothing is saved by it. On a running board, /sys/module/usbcore/parameters/autosuspend reads -1.
+# While the USB 3 ports are being proven: the debug messages of the Type-C port's PHY and of USB's
+# core (ports training, resetting and changing speed), which go to the kept journal
+# (journalctl -k), not to the screen. Take those two out once the ports are trusted. ---
 grep -q '^extraargs=' /boot/armbianEnv.txt || echo 'extraargs=' >>/boot/armbianEnv.txt
-sed -i 's/^extraargs=\(.*\)$/extraargs=\1 usbcore.autosuspend=-1/' /boot/armbianEnv.txt
-grep -q '^extraargs=.* usbcore.autosuspend=-1$' /boot/armbianEnv.txt ||
-  { echo "/boot/armbianEnv.txt didn't take usbcore.autosuspend=-1" >&2; exit 1; }
+for argument in usbcore.autosuspend=-1 phy_rockchip_usbdp.dyndbg=+p usbcore.dyndbg=+p; do
+  sed -i "s/^extraargs=\\(.*\\)\$/extraargs=\\1 $argument/" /boot/armbianEnv.txt
+  grep -q "^extraargs=.* $argument\\( \\|\$\\)" /boot/armbianEnv.txt ||
+    { echo "/boot/armbianEnv.txt didn't take $argument" >&2; exit 1; }
+done
+# The kernel's messages on the screen and the serial port as it starts (Armbian's default shows
+# only emergencies): a board that never reaches the network says where it stopped.
+sed -i 's/^verbosity=.*/verbosity=7/' /boot/armbianEnv.txt
+grep -qx 'verbosity=7' /boot/armbianEnv.txt || echo 'verbosity=7' >>/boot/armbianEnv.txt
 
 # --- Spotter's debian pack, from the source of the agent's own release (paddock.yaml downloads it,
 # and it stays where it's put, as Paddock's inspection checks): the computer's own health, CPU, heat,
