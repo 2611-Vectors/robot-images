@@ -27,7 +27,7 @@ printf 'LoadState=%s\nActiveState=%s\nSubState=%s\nNRestarts=%s\n' $state $resta
 EOF
   # runuser -u visor -- /opt/visor/visor version
   case $visor in
-    runs) printf '#!/bin/sh\necho "visor 2026.11.14 (version ID 20261114)"\n' >"$dir/bin/runuser" ;;
+    runs) printf '#!/bin/sh\necho "visor 2026.11.16 (version ID 20261116)"\n' >"$dir/bin/runuser" ;;
     fails) printf '#!/bin/sh\necho "visor: cannot execute binary file" >&2\nexit 126\n' >"$dir/bin/runuser" ;;
     no-user) printf '#!/bin/sh\necho "runuser: user visor does not exist" >&2\nexit 1\n' >"$dir/bin/runuser" ;;
   esac
