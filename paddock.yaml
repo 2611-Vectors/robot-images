@@ -49,9 +49,6 @@ images:
       - file: files/visor/visor-service.conf
         to: /etc/systemd/system/visor.service.d/10-team.conf
         mode: "0644"
-      - file: files/visor/cpu-performance.service
-        to: /etc/systemd/system/cpu-performance.service
-        mode: "0644"
       # Logins by SSH key only, each drive with its own host key; NetworkManager's settings; the
       # journal kept and synced; e2fsck that copes with no clock battery.
       - file: files/sshd.conf

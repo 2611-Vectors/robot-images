@@ -18,7 +18,20 @@ rm -rf /var/lib/apt/lists/*
 sh "$PADDOCK_CONFIG_DIR/setup/chrony-conf.sh" /etc/frc-spotter/agent.json \
   "$PADDOCK_CONFIG_DIR/files/visor/chrony.conf" >/etc/chrony/chrony.conf
 chmod 0644 /etc/chrony/chrony.conf
-systemctl enable NetworkManager.service chrony.service cpu-performance.service
+systemctl enable NetworkManager.service chrony.service
+
+# --- Every core at its full clock from boot: a clock ramping up and down costs Visor more frame
+# time than it saves power (frames stalled 23 to 28 ms on `ondemand`, against 7 ms). Armbian's own
+# hardware script (/usr/lib/armbian/armbian-hardware-optimization) sets every core's governor from
+# this file as the board starts, and does it in the background, after its unit has finished: a unit
+# of ours that set the governor "after" it was written over. So the file is the governor's one
+# place. On a running board, /sys/devices/system/cpu/cpufreq/policy*/scaling_governor reads
+# performance. ---
+sed -i 's/^GOVERNOR=.*/GOVERNOR=performance/' /etc/default/cpufrequtils
+grep -qx 'GOVERNOR=performance' /etc/default/cpufrequtils ||
+  { echo "/etc/default/cpufrequtils didn't take GOVERNOR=performance" >&2; exit 1; }
+grep -q 'GOVERNOR.*scaling_governor' /usr/lib/armbian/armbian-hardware-optimization ||
+  { echo "Armbian's hardware script no longer sets the governor from /etc/default/cpufrequtils" >&2; exit 1; }
 
 # --- Kernel arguments (/boot/armbianEnv.txt's extraargs go onto its command line).
 # USB never sleeps: the camera driver lets an idle camera sleep after two seconds, so opening a

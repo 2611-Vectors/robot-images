@@ -54,10 +54,10 @@ needs paid ARM runners.
 | Path | What |
 |---|---|
 | `paddock.yaml` | The images (each a base and its steps) and the computers stamped from them. Paddock's README says every key |
-| `setup/visor-orangepi.sh` | The image's own setup: NetworkManager and chrony, Spotter's debian pack from its release's source, Visor's program and its part of the image (`os/` in its release), and the admin login |
+| `setup/visor-orangepi.sh` | The image's own setup: NetworkManager and chrony, every core at its full clock (through Armbian's own settings file), Spotter's debian pack from its release's source, Visor's program and its part of the image (`os/` in its release), and the admin login |
 | `setup/chrony-conf.sh` | chrony's configuration, its server the controller's address from `files/visor/agent.json` |
 | `setup/armbian-robot.sh` | Its last step, for a robot computer from the pinned Armbian base: NetworkManager owning the network, a read-only root's needs, no default passwords. Each part says why; its masks are of this base's units |
-| `files/` | Files the steps copy in: SSH's settings and each drive's own host key, NetworkManager's, the journal's, e2fsck's, the agent waiting for the kept paths' mounts; `files/visor/`: Spotter's settings (the controller's address), this board's part of Visor's unit (its fast cores, `/opt/visor` on the data partition), `visor` on the PATH for people (never as root), chrony's (its server filled in at the build), the CPU at full clock |
+| `files/` | Files the steps copy in: SSH's settings and each drive's own host key, NetworkManager's, the journal's, e2fsck's, the agent waiting for the kept paths' mounts; `files/visor/`: Spotter's settings (the controller's address), this board's part of Visor's unit (its fast cores, `/opt/visor` on the data partition), `visor` on the PATH for people (never as root), chrony's (its server filled in at the build) |
 | `keys/authorized_keys` | Your team's SSH public keys |
 | `test/files_test.sh` | The lines in `files/` the boards depend on (chrony's `rtcsync`, the agent starting without the data partition, `visor` refusing root, the controller's address in one place), checked before every build |
 | `test/boot_check.sh` | The boot check (`boot:` in `paddock.yaml`): Paddock boots a copy of each built image in a container and runs it there, before any computer is stamped. It fails the build unless Spotter's agent is running, listening and never restarted, and Visor's program runs as its own user. `test/boot_check_test.sh` runs it on stand-ins, before every build |

@@ -17,12 +17,14 @@ must_have=(
   "files/frc-spotter.conf|After=opt-visor.mount var-lib-frc\\x2dspotter.mount|the agent waits for the kept paths' mounts when they work"
   "files/visor/visor-service.conf|RequiresMountsFor=/opt/visor|Visor runs only from the kept /opt/visor"
   "files/visor/visor-service.conf|CPUAffinity=4-7|Visor runs on the RK3588's fast cores, which are this board's to name"
-  "files/visor/cpu-performance.service|After=sysinit.target armbian-hardware-optimize.service|Armbian's hardware script sets the governor too, and the last to write wins: without the order the fast cores can be left ramping"
+  "setup/visor-orangepi.sh|sed -i 's/^GOVERNOR=.*/GOVERNOR=performance/' /etc/default/cpufrequtils|Armbian's hardware script sets every core's governor from that file as the board starts: left at ondemand, the fast cores ramp and Visor's frames stall"
 )
 must_not_have=(
   "files/frc-spotter.conf|RequiresMountsFor=|a failed data partition would stop the agent, and the board would go dark"
   "files/frc-spotter.conf|ReadWritePaths=|what the agent may write is its own unit's and Visor's release's, not a copy here"
   "setup/visor-orangepi.sh|ln -s /opt/visor/visor /usr/local/bin/visor|root's PATH would reach a program the agent can write"
+  "setup/visor-orangepi.sh|echo performance|a unit or line of ours that writes the governor is written over by Armbian's script, which works in the background: /etc/default/cpufrequtils is its one place"
+  "paddock.yaml|cpu-performance.service|that unit set the governor after Armbian's unit, and lost to its background work"
 )
 
 lines_of() {
